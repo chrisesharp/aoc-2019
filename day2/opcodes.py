@@ -1,27 +1,26 @@
-def execute(instr, instructions):
+def execute(instr, memory):
     op = int(instr[0])
     A = int(instr[1])
     B = int(instr[2])
     C = int(instr[3])
 
     if op == 1:
-        instructions[C] = instructions[A] + instructions[B]
+        memory[C] = memory[A] + memory[B]
     elif op == 2:
-        instructions[C] = instructions[A] * instructions[B]
-    return instructions
+        memory[C] = memory[A] * memory[B]
+    return memory
 
 def fetch(instructions):
-    adv = 1
-    if instructions[0] != 99:
-        adv = 4
+    adv = 4
+    if instructions[0] == 99:
+        adv = 1
     return instructions[:4], adv
 
 def run(instructions):
-    instr, next_op = fetch(instructions)
     ip=0
-    adv=4
+    instr, adv = fetch(instructions)
     while instr[0] != 99:
-        ip+= adv
+        ip += adv
         instructions = execute(instr, instructions)
         instr, adv = fetch(instructions[ip:])
     return instructions
@@ -47,4 +46,4 @@ if __name__ == '__main__':
             output = run(prog)[0]
             if output == 19690720:
                 print("Found it: ", 100 * noun + verb)
-                exit
+                break

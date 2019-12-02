@@ -1,13 +1,13 @@
 from math import floor
 
 def fuel_calc(mass):
-    return floor(mass / 3) - 2
+    return max(0, floor(mass / 3) - 2)
 
 def fuel_calc2(mass):
     extra_fuel = fuel_calc(mass)
     fuel_mass = extra_fuel
     while fuel_mass > 2:
-        fuel_mass = max(fuel_calc(fuel_mass),0)
+        fuel_mass = fuel_calc(fuel_mass)
         extra_fuel += fuel_mass
     return extra_fuel
 
