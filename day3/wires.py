@@ -19,44 +19,32 @@ def trace_path(route):
             path.append((x,y))
     return path
 
-def distance(A,B):
+def manhatten_distance(A,B):
     (x,y) = A
     (p,q) = B
     return abs(x-p) + abs(y-q)
 
-def closest(intersect):
-    closest = maxsize
-    for point in intersect:
-        dist = distance(point,(0,0))
-        closest = min(closest, dist)
-    return closest
+def distance(A, paths=None):
+    return manhatten_distance(A, (0,0))
 
-def stepcount(point, path):
+def stepcount(point, paths):
     steps = 0
-    for step in path:
-        steps += 1
-        if step == point:
-            break
+    for path in paths:
+        steps += path.index(point) + 1
     return steps
 
-
-def shortest(intersect, paths):
-    closest = maxsize
+def calculate_distance(func, paths):
+    intersect = set(paths[0]) & set(paths[1])
+    steps = maxsize
     for point in intersect:
-        steps = 0
-        for path in paths:
-            steps += stepcount(point, path)
-        closest = min(steps, closest)
-    return closest
-
+        steps = min(steps, func(point, paths))
+    return steps
 
 if __name__ == '__main__':
     file = open("input1.txt", "r")
     first = trace_path(file.readline())
     second = trace_path(file.readline())
-    intersect = set(first) & set(second)
-    result = closest(intersect)
+    result = calculate_distance(distance, [first, second])
     print("Part 1:", result)
-    result = shortest(intersect,[first,second])
+    result = calculate_distance(stepcount, [first, second] )
     print("Part 2:", result)
-
