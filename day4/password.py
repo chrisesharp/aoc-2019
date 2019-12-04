@@ -7,12 +7,10 @@ def correct_length(password):
 
 def digits_increase(password):
     pw = str(password)
-    if correct_length(pw):
-        for i in range(5):
-            if pw[i] > pw[i+1]:
-                return False
-        return True
-    return False
+    if not correct_length(pw): return False
+    for i in range(5):
+        if pw[i] > pw[i+1]: return False
+    return True
 
 def is_doubled(password, number, part1):
     if part1:
@@ -23,8 +21,7 @@ def is_doubled(password, number, part1):
 def contains_double(password, part1=True):
     p = str(password)
     for i in range(10):
-        if is_doubled(p, i, part1):
-            return True
+        if is_doubled(p, i, part1): return True
     return False
 
 if __name__ == '__main__':

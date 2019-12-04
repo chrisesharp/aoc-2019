@@ -27,6 +27,7 @@ class TestPasswordChecker(unittest.TestCase):
         input = 114356
         self.assertFalse(digits_increase(input))
         self.assertTrue(digits_increase(123456))
+        self.assertFalse(digits_increase(1234567))
     
     def test_examples_work(self):
         input1 = 111111
