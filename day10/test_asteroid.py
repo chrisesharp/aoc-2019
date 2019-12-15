@@ -53,7 +53,7 @@ class AsteroidTest(unittest.TestCase):
         self.assertEqual((5,8), best[0])
         self.assertEqual(33,best[1])
     
-    def test_ex1_map(self):
+    def test_ex2_map(self):
         input = """
 .#....###24...#..
 ##...##.13#67..9#
