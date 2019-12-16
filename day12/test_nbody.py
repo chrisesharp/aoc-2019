@@ -1,6 +1,6 @@
 import unittest
 
-from moons import Moon, get_moons, get_pairs, apply_gravity, tick
+from moons import Moon, get_moons, get_pairs, apply_gravity, tick, tick_cycles, lcm
 
 class MoonTest(unittest.TestCase):    
     def test_parse_input(self):
@@ -67,46 +67,25 @@ class MoonTest(unittest.TestCase):
             energy = tick(moons)
         self.assertEqual(1940, energy)
     
-#     def test_cycle_ex1(self):
-#         input = """<x=-1, y=0, z=2>
-# <x=2, y=-10, z=-7>
-# <x=4, y=-8, z=8>
-# <x=3, y=5, z=-1>"""
-#         moons = get_moons(input)        
-#         i = 0
-#         # cycled = False
-#         # while not cycled:
-#         #     tick(moons)
-#         #     i+=1
-#         self.assertEqual(2772,i)
+    def test_cycle_ex1(self):
+        input = """<x=-1, y=0, z=2>
+<x=2, y=-10, z=-7>
+<x=4, y=-8, z=8>
+<x=3, y=5, z=-1>"""
+        moons = get_moons(input)        
+        tx, ty, tz = tick_cycles(moons)
+        cycle = lcm(lcm(tx, ty), lcm(ty, tz))
+        self.assertEqual(2772,cycle)
 
-#     def test_cycle_ex2(self):
-#         input = """<x=-8, y=-10, z=0>
-# <x=5, y=5, z=10>
-# <x=2, y=-7, z=3>
-# <x=9, y=-8, z=-3>"""
-#         moons = get_moons(input)
-#         moon_shots = set()
-#         lst = ""
-#         for moon in moons:
-#             lst += str(hash(moon))
-#         moon_shots.add(lst)
-#         i = 0
-#         cycled = False
-#         while not cycled:
-#             tick(moons)
-#             lst = ""
-#             for moon in moons:
-#                 lst += str(hash(moon))
-#             # print(lst)
-#             if lst in moon_shots:
-#                 cycled = True
-#             else:
-#                 moon_shots.add(lst)
-#             i+=1
-#             # print(i)
-#         self.assertEqual(4686774924,i)
-
+    def test_cycle_ex2(self):
+        input = """<x=-8, y=-10, z=0>
+<x=5, y=5, z=10>
+<x=2, y=-7, z=3>
+<x=9, y=-8, z=-3>"""
+        moons = get_moons(input)
+        tx, ty, tz = tick_cycles(moons)
+        cycle = lcm(lcm(tx, ty), lcm(ty, tz))
+        self.assertEqual(4686774924,cycle)
 
 if __name__ == '__main__':
     unittest.main()
