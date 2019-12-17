@@ -1,7 +1,6 @@
 import unittest
 
-from foo import get_reactions, get_required
-# from foo import parse_input
+from reactor import get_reactions, ore_required
 
 class ReactorTest(unittest.TestCase):    
     def test_parse_input(self):
@@ -11,9 +10,9 @@ class ReactorTest(unittest.TestCase):
 7 A, 1 C => 1 D
 7 A, 1 D => 1 E
 7 A, 1 E => 1 FUEL"""
-        reactions = get_reactions(input.split("\n"))
+        reactions = get_reactions(input)
         print(reactions)
-        self.assertEqual(31, get_required(reactions))
+        self.assertEqual(31, ore_required(reactions))
 
 if __name__ == '__main__':
     unittest.main()
