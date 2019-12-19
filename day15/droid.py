@@ -107,11 +107,9 @@ def fill(ship_map, loc, t = 0):
   return max([ fill(ship_map, loc, t + 1) for loc in neighbours(ship_map, loc) ])
 
 
-
 if __name__ == '__main__':
     file = "input.txt"
     prog = get_program(file)
-    
     droid = Droid(prog)
     oxygen, min_steps, ship_map = droid.map_ship()
     print("Part 1:", min_steps)

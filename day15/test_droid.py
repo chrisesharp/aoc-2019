@@ -4,7 +4,7 @@ from droid import Droid
 from direction import Direction
 
 class DroidTest(unittest.TestCase):    
-    def test_step_left_position(self):
+    def test_step_positions(self):
         droid = Droid()
         droid.step(Direction.WEST)
         self.assertEqual((-1,0),droid.location)
