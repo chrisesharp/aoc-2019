@@ -12,8 +12,11 @@ class Droid:
     ord(">") : Direction.RIGHT,
     ord("v") : Direction.DOWN
   }
+  
   SCAFFOLD = 35
   NEWLINE = 10
+  
+  FUNCS = [ "A", "B", "C"]
 
   def __init__(self, prog):
     self.prog = prog
@@ -105,13 +108,71 @@ class Droid:
 
 def scaffolds(map, loc):
   (x, y) = loc
-  deltas = [(0,0),(0, -1), (0, 1), (-1, 0), (1, 0)]
+  deltas = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0)]
   neighbours = [(x + dx, y + dy) for dx, dy in deltas]
   return [n for n in neighbours if n in map]
 
-def optimize(path):
+def find_factors(path):
+  path_repr = ",".join(path)
+  index = 0
+  length = len(path)
+  hits = {}
+  while index < len(path)-1:
+    func = ",".join(path[index:index+length])
+    if len(func) > 20 or any(letter in func for letter in Droid.FUNCS):
+      length -= 1
+      continue
+    if length == 0:
+      index += 1
+      length = len(path)
+      continue
+    occurences = path_repr.count(func)
+    if occurences:
+      hits[func]=occurences
+      length -= 1
+    else:
+      break
+  return [func for func, _ in sorted(hits.items(), key=lambda item: item[1]* len(item[0]))]
 
-  pass
+def refactor(index, func, path):
+  func_name = Droid.FUNCS[index]
+  return ",".join(path).replace(func+",",func_name+",").replace(","+func,","+func_name).replace(func,func_name).split(",")
+
+def factorize(path):
+  options = find_factors(path)
+  factor = options.pop()
+  path_opts = {}
+  path_opts[str(path)]=options
+  queue = [factor]
+  chosen = []
+  paths = [path]
+  func = None
+  func_index = 0
+  while func := queue.pop():
+    new_path = refactor(func_index, func, path)
+    if len(new_path) < len(path):
+      paths.append(new_path)
+      func_index += 1
+      chosen.append(func)
+      if not path_opts.get(str(new_path)):
+        path_opts[str(new_path)] = find_factors(new_path)
+    path = paths[-1]
+    
+    if is_complete(path):
+      break
+    
+    while (len(chosen) == 3) or (not path_opts[str(path)]):
+      chosen.pop()
+      paths.pop()
+      path = paths[-1]
+      func_index -= 1
+
+    queue.append(path_opts[str(path)].pop())
+  return chosen, ",".join(path)
+    
+
+def is_complete(path):
+  return len([x for x in path if x not in Droid.FUNCS]) == 0
 
 
 if __name__ == '__main__':
@@ -122,22 +183,17 @@ if __name__ == '__main__':
     intersections = droid.find_intersections()
     print(droid.display(view))
     print("Part 1:")
-    total = reduce((lambda x,y: x+y), list(map(lambda x: x[0] * x[1], intersections)))
-    print(total)
+    print(reduce((lambda x,y: x+y), list(map(lambda x: x[0] * x[1], intersections))))
 
     print('Part 2:')
-    path = ",".join(droid.find_path(view, start))
-    print(path)
-    funcA = "L,4,L,10,L,6"
-    funcB = "L,6,R,8,L,10,L,8,L,8"
-    funcC = "L,6,L,4,R,8,R,8"
-    path = path.replace(funcA,"A").replace(funcB,"B").replace(funcC,"C")
+    print("Factoring functions from path")
+    funcs, path = factorize(droid.find_path(view, start))
     input =["n\n"]
-    input.append(funcC + "\n")
-    input.append(funcB + "\n")
-    input.append(funcA + "\n")
+    for i in list(reversed(funcs)):
+      input.append(i + "\n")
     input.append(path + "\n")
+    print("Running droid with program")
     output = droid.clean(input)
-    results = droid.display(output)
-    loc = (0,droid.bottom_right[1])
-    print("Answer: ", output[loc])
+    answer_loc = (0,droid.bottom_right[1])
+    # print(droid.display(output))
+    print("Answer: ", output[answer_loc])
