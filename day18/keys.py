@@ -22,22 +22,21 @@ class Grid():
 
         index = one_dimensional_grid.index('@')
         x, y = index % self.width, index // self.width
-
         self.start_pos = ((x,y),)
-        if part2:
-            self.grid[y-1] = self.grid[y-1][:x]   +  '#'  + self.grid[y-1][x+1:]
-            self.grid[  y] = self.grid[y  ][:x-1] + '###' + self.grid[y  ][x+2:]
-            self.grid[y+1] = self.grid[y+1][:x]   +  '#'  + self.grid[y+1][x+1:]
-            self.start_pos = ((x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1), )
+    
+    def set_part2(self):
+        (x,y) = self.start_pos[0]
+        self.grid[y-1] = self.grid[y-1][:x]   +  '#'  + self.grid[y-1][x+1:]
+        self.grid[  y] = self.grid[y  ][:x-1] + '###' + self.grid[y  ][x+2:]
+        self.grid[y+1] = self.grid[y+1][:x]   +  '#'  + self.grid[y+1][x+1:]
+        self.start_pos = ((x-1, y-1), (x+1, y-1), (x-1, y+1), (x+1, y+1), )
     
     def at(self, loc):
-        x,y = loc
-        return self.grid[y][x]
+        return self.grid[loc[1]][loc[0]]
         
     def reachable_keys(self, loc, keys):
         queue = collections.deque([(loc, 0)])
         seen = set()
-        
         while queue:
             current, length = queue.popleft()
             node = self.at(current)
@@ -49,7 +48,7 @@ class Grid():
                     continue
                 seen.add(neighbour)
                 node = self.at(neighbour)
-                if node and (not_wall(node) and (not_door(node) or key_for(node) in keys)):
+                if (not_wall(node) and (not_door(node) or key_for(node) in keys)):
                     queue.append((neighbour, length + 1))
 
     def get_adjacents(self, loc):
@@ -67,25 +66,26 @@ def shortest_path(grid):
     queue = [(0, pos, frozenset())]
     seen = set()
     while queue:
-        dist, current_pos, keys = heapq.heappop(queue)
+        dist, current_positions, keys = heapq.heappop(queue)
         if keys == grid.allkeys:
             return dist
 
-        if (current_pos, keys) in seen:
+        if (current_positions, keys) in seen:
             continue
-        seen.add((current_pos, keys))
+        seen.add((current_positions, keys))
 
-        for i, bot in enumerate(current_pos):
-            for length, pos, key in grid.reachable_keys(bot, keys):
-                next_pos = current_pos[0:i] + (pos,) + current_pos[i+1:]
-                heapq.heappush(queue, (dist + length, next_pos, keys | frozenset([key])))
+        for i, bot_loc in enumerate(current_positions):
+            for length, pos, key in grid.reachable_keys(bot_loc, keys):
+                next_positions = current_positions[0:i] + (pos,) + current_positions[i+1:]
+                heapq.heappush(queue, (dist + length, next_positions, keys | frozenset([key])))
     return None
 
 
 if __name__ == "__main__":
     input = open("input.txt").readlines()
+    grid = Grid(input)
     print("Part 1:")
-    print(shortest_path(Grid(input)))
-    
+    print(shortest_path(grid))
+    grid.set_part2()
     print("Part 2:")
-    print(shortest_path(Grid(input, True)))
+    print(shortest_path(grid))
