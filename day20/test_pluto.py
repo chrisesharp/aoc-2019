@@ -24,11 +24,11 @@ FG..#########.....#
              Z       """
       maze = Maze(input.split("\n"))
       self.assertEqual(set(maze.portals.keys()), {(9,2),(9,6),(2,8),(6,10),(2,13),(2,15),(11,12),(13,16)})
-      self.assertEqual(maze.gate_locs["AA"],{(9,2)})
-      self.assertEqual(maze.gate_locs["BC"],{(9,6),(2,8)})
-      self.assertEqual(maze.gate_locs["DE"],{(6,10),(2,13)})
-      self.assertEqual(maze.gate_locs["FG"],{(2,15),(11,12)})
-      self.assertEqual(maze.gate_locs["ZZ"],{(13,16)})
+      self.assertEqual(set(maze.gate_locs["AA"]),{(9,2)})
+      self.assertEqual(set(maze.gate_locs["BC"]),{(9,6),(2,8)})
+      self.assertEqual(set(maze.gate_locs["DE"]),{(6,10),(2,13)})
+      self.assertEqual(set(maze.gate_locs["FG"]),{(2,15),(11,12)})
+      self.assertEqual(set(maze.gate_locs["ZZ"]),{(13,16)})
 
   def test_next_steps(self):
       input = """         A           

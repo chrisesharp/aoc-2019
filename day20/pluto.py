@@ -2,30 +2,39 @@ import itertools
 import heapq
 import collections
 
+above = lambda loc: (loc[0], loc[1]-1)
+below = lambda loc: (loc[0], loc[1]+1)
+left  = lambda loc: (loc[0]-1, loc[1])
+right = lambda loc: (loc[0]+1, loc[1])
+
 class Maze():
     def __init__(self, input, part2=False):
         self.grid = [s for s in input]
         self.width, self.height = len(self.grid[0]), len(self.grid)
-        one_dimensional_grid = list(itertools.chain.from_iterable(self.grid))
-        letters = set(c for c in one_dimensional_grid if c.isupper())
-
         self.portals = {}
-        for letter in letters:
-            index = 0
-            for i in range(one_dimensional_grid.count(letter)):
-                index = one_dimensional_grid.index(letter, index+1)
-                x, y = index % self.width, index // self.width
-                neighbour_letters, gate = self.gate_letters((x,y))
-                if gate:
-                    neighbour_letters.append(letter)
-                    self.portals[gate] = "".join(sorted(neighbour_letters))
-        
-        self.gate_locs = {}
-        for loc, gate in self.portals.items():
-            locs = self.gate_locs.get(gate, set())
-            locs.add(loc)
-            self.gate_locs[gate] = locs
-        
+        self.gate_locs = collections.defaultdict(list)
+
+        def find_gate(loc, direction, opposite):
+            label = gate_loc = None
+            if self.at(direction(loc)).isupper():
+                label = self.at(loc) + self.at(direction(loc))
+                if self.at(opposite(loc)) == '.':
+                    gate_loc = opposite(loc)
+                elif self.at(direction(direction(loc))) == '.':
+                    gate_loc = direction(direction(loc))
+            return label, gate_loc
+
+
+        for loc in [(x,y) for y in range(self.height - 1) for x in range(self.width - 1)]:
+            if not self.at(loc).isupper():
+                continue
+            label, gate_loc = find_gate(loc, below, above)
+            if not label:
+                label, gate_loc = find_gate(loc, right, left)
+            if label:
+                self.gate_locs[label].append(gate_loc)
+                self.portals[gate_loc] = label
+
         self.width -= 1
         self.start = list(self.gate_locs["AA"]).pop()
         self.end = list(self.gate_locs["ZZ"]).pop()
@@ -42,13 +51,9 @@ class Maze():
         seen = set()
         while queue:
             dist, level, current_position = heapq.heappop(queue)
-            if current_position == self.end and level < 2:
-                return dist
-
-            if (current_position, level) in seen:
-                continue
+            if current_position == self.end and level <= 1: return dist
+            if (current_position, level) in seen: continue
             seen.add((current_position, level))
-
             for length, pos, new_level in self.reachable_gates(current_position, level):
                 heapq.heappush(queue, (dist + length, new_level, pos))
 
@@ -63,34 +68,27 @@ class Maze():
                 if len(gates) > 1:
                     gates.remove(current)
                     gate = gates[0]
-                    if not level:
-                        yield (length + 1, gate, 0)
+                    if not level: yield (length + 1, gate, 0)
                     elif not self.is_outer_gate(current):
                         yield (length + 1, gate, level + 1 )
                     elif level > 1:
                         yield (length + 1, gate, level - 1 )
                 else:
-                    if level <= 1:
-                        yield (length, current, level)
+                    if level <= 1: yield (length, current, level)
 
             for neighbour, tile in self.get_adjacents(current):
-                if neighbour in seen:
-                    continue
+                if neighbour in seen: continue
                 seen.add(neighbour)
-                if tile == ".":
-                    queue.append((neighbour, length + 1))
+                if tile == ".": queue.append((neighbour, length + 1))
 
-    def is_outer_gate(self, gate):
-        return (gate[0]==2 or gate[0]==self.width-3) or (gate[1]==2 or gate[1]==self.height-3)
+    def is_outer_gate(self, loc):
+        return (loc[0]==2 or loc[0]==self.width - 3) or (loc[1]==2 or loc[1]==self.height - 3)
     
     def get_adjacents(self, loc):
-        x,y = loc
-        neighbours = []
-        deltas = [(x-1,y),(x+1,y),(x,y-1),(x,y+1)]
+        deltas = [above(loc), below(loc),left(loc),right(loc)]
         for loc in deltas:
             tile = self.at(loc)
-            if tile:
-                yield loc, tile
+            if tile != "#": yield loc, tile
     
     def gate_letters(self, pos):
         neighbours = []
