@@ -40,19 +40,13 @@ WALK
         print("Part 1: ", "".join(output))
     part2 = \
 """NOT A J
-NOT C T
-AND D T
+NOT B T
 AND H T
 OR T J
 NOT C T
-AND D T
-AND E T
-AND F T
-AND G T
+AND H T
 OR T J
-NOT B T
-AND D T
-OR T J
+AND D J
 RUN
 """
     output = droid.run_script(part2)
