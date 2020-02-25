@@ -24,18 +24,16 @@ class GameOfLife(object):
     def __init__(self, input):
         (self.max_x, self.max_y, alive_cells) = parse(input)
         self.all_cells = [(x,y) for y in range(self.max_y) for x in range(self.max_x)]
-        cells = self.serialize(alive_cells)
-        self.levels = { 0:cells, -1:"0"*25, 1:"0"*25 }
-    
+        self.levels = { 0: alive_cells}    
     def __str__(self):
         return self.print(0)
     
     def count_bugs(self):
-        return sum([self.levels[level].count("1") for level in self.levels])
+        return sum([len(self.levels[level]) for level in self.levels])
     
     def get_level(self, level):
-        if level not in self.levels.keys():
-            self.levels[level] = "0"*25
+        if level not in self.levels:
+            self.levels[level] = set()
         return self.levels[level]
     
     def tick_all(self, max_mins=1):
@@ -44,7 +42,7 @@ class GameOfLife(object):
         time = 0
         while time < max_mins:
             for level in current_levels:
-                new_levels[level] = self.serialize(self.next_gen(level))
+                new_levels[level] = self.next_gen(level)
             self.levels = dict(new_levels)
             time += 1
             current_levels.append(time+1)
@@ -52,16 +50,13 @@ class GameOfLife(object):
     
     def next_gen(self, level):
         return self.survivors(level).union(self.births(level))
-    
-    def serialize(self, cells):
-        return "".join([str(int(cell in cells)) for cell in self.all_cells])
         
     def survivors(self, level):
-        cells = self.deserialize(self.get_level(level))
+        cells = self.get_level(level)
         return set([cell for cell in cells if self.will_survive(cell, level)])
     
     def births(self, level):
-        cells = self.deserialize(self.get_level(level))
+        cells = self.get_level(level)
         births = set()
         for cell in cells:
             for (deadNeighbour, lvl) in self.deadNeighbours(cell, level):
@@ -85,8 +80,8 @@ class GameOfLife(object):
         return [(x+dx, y+dy) for (dx, dy) in deltas if (x+dx, y+dy) != (2,2)]
 
     def neighbours(self, cell, level, alive):
-        cells = self.deserialize(self.get_level(level))
-        lower_level = self.deserialize(self.get_level(level - 1))
+        cells = self.get_level(level)
+        lower_level = self.get_level(level - 1)
         neighbours = []
         
         for centre, edge in edge_maps.items():
@@ -105,7 +100,7 @@ class GameOfLife(object):
         return set(neighbours)
     
     def other_neighbours(self, alive, edge, lvl):
-        level = self.deserialize(self.get_level(lvl))
+        level = self.get_level(lvl)
         return [(neighbour, lvl) for neighbour in edge if (neighbour in level) is alive]
 
     def out_of_bounds_map(self, cell):
@@ -125,16 +120,8 @@ class GameOfLife(object):
     def deadNeighbours(self, cell, level):
         return self.neighbours(cell, level, False)
     
-    def deserialize(self, cells):
-        encoded_string = list(cells)
-        live_cells = set()
-        for pos in self.all_cells:
-            if int(encoded_string.pop(0)):
-                live_cells.add(pos)
-        return live_cells
-
     def print(self, level):
-        alive_cells = self.deserialize(self.get_level(level))
+        alive_cells = self.get_level(level)
         output = ""
         for (x,y) in self.all_cells:
             output += icons[(x,y) in alive_cells]
