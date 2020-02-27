@@ -9,7 +9,7 @@ class ZorkDroid():
     def __init__(self, file_name, input):
         self.program = get_program(file_name)
         self.input_device = input
-        self.proc = Processor(self.program, 32768)
+        self.proc = Processor(self.program, 4096)
         self.proc.set_std_input(self.input_device)
         self.inventory = set()
         self.rooms = {}
