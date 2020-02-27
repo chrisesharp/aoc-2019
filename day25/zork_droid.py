@@ -41,13 +41,8 @@ class ZorkDroid():
         
         for item in items:
             self.take_item(item, commands)
-        
         self.choose_direction(commands)
-
-        while commands:
-            command = commands.pop()
-            self.input_device.append(command)
-        return finished, None
+        return False, commands
 
     def update_room(self, room, desc, doors):
         if room:
@@ -71,6 +66,14 @@ class ZorkDroid():
         direction = directions[choice]
         commands.append(direction + "\n")
 
+    def follow_commands(self, commands):
+        while commands:
+            command = commands.pop(0)
+            self.input_device.append(command)
+            finished, output = self.move()
+            if finished:
+                return finished, output
+        return False, output
 
     def end_game(self):
         print("Collected all items")
@@ -82,12 +85,8 @@ class ZorkDroid():
             for item in permutation:
                 self.take_item(item, commands)
             commands.append("west\n")
-            while commands:
-                command = commands.pop(0)
-                self.input_device.append(command)
-                finished, output = self.move()
-                if finished:
-                    return finished, output
+            finished, output = self.follow_commands(commands)
+            if finished: break
         return finished, output
     
     def all_item_combinatins(self):
@@ -132,11 +131,15 @@ if __name__ == '__main__':
     if len(sys.argv) > 1: interactive = True
     droid = ZorkDroid(program, Keyboard())
     finished, output = droid.move()
+    commands = []
     while not finished:
         if interactive:
             print(output)
+            finished, output = droid.move()
         else:
-            finished, output = droid.action(output)
-        if finished: break
-        finished, output = droid.move()
+            finished, commands = droid.action(output)
+            if finished: 
+                output = commands
+                break
+            finished, output = droid.follow_commands(commands)
     print("Part 1:",output)
