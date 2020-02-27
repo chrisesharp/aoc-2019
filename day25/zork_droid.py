@@ -5,6 +5,18 @@ import itertools
 
 bad_items = ["escape pod","infinite loop","giant electromagnet","molten lava","photons"]
 
+def is_command_prompt(result):
+    return "".join(result[-8:]).find("Command?") >= 0
+
+def stripped(result):
+    return "".join(result[:-8]).strip()
+
+def keypin_from_output(result):
+    last_bit = "".join(result[-50:])
+    start = last_bit.find("typing ") + 4
+    return last_bit[start:start+10]
+
+
 class ZorkDroid():
     def __init__(self, file_name, input):
         self.program = get_program(file_name)
@@ -18,17 +30,12 @@ class ZorkDroid():
     def move(self):
         result = []
         while True:
-            output = self.proc.run_to_output()
-            if output:
+            if output := self.proc.run_to_output():
                 result.append(chr(output))
-            else:
-                break
-            if "".join(result[-8:]).find("Command?") >= 0:
-                return False, "".join(result[:-8]).strip()
-
-        last_bit = "".join(result[-50:])
-        start = last_bit.find("typing ") + 4
-        return True, last_bit[start:start+10]
+                if is_command_prompt(result):
+                    return False, stripped(result)
+            else: break
+        return True, keypin_from_output(result)
     
     def action(self, text):
         finished = False
@@ -37,7 +44,7 @@ class ZorkDroid():
         self.update_room(room, desc, doors)
         
         if self.current_room == "Security Checkpoint" and len(self.inventory) == 8:
-            return self.end_game()
+            return self.pass_security()
         
         for item in items:
             self.take_item(item, commands)
@@ -75,7 +82,7 @@ class ZorkDroid():
                 return finished, output
         return False, output
 
-    def end_game(self):
+    def pass_security(self):
         print("Collected all items")
         commands = []
         finished = False
@@ -107,23 +114,23 @@ class ZorkDroid():
         desc = lines.pop(0)
         while lines:
             line = lines.pop(0)
-            if line.find("Doors here lead") >= 0:
-                line = lines.pop(0)
-                while line.find("-") >= 0:
-                    doors.append(line[2:])
-                    if lines:
-                        line = lines.pop(0)
-                    else:
-                        break
-            if line.find("Items here:") >= 0:
-                line = lines.pop(0)
-                while line.find("-") >= 0:
-                    items.append(line[2:])
-                    if lines:
-                        line = lines.pop(0)
-                    else:
-                        break
+            if line.find("Doors") >= 0:
+                doors = self.get_list(lines)
+            if line.find("Items") >= 0:
+                items = self.get_list(lines)
         return room, desc, doors, items
+    
+    def get_list(self, lines):
+        things = []
+        line = lines.pop(0)
+        while line.find("-") >= 0:
+            things.append(line[2:])
+            if lines:
+                line = lines.pop(0)
+            else:
+                break
+        return things
+
 
 if __name__ == '__main__':
     program = "input.txt"
