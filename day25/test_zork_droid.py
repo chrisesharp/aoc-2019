@@ -45,6 +45,25 @@ Doors here lead:
         self.assertEqual(items,["dark matter"])
         self.assertFalse(finished)
 
+    def test_zorkdroid_program_action(self):
+        kb = Keyboard()
+        input = ["north\n"]
+        for command in input:
+                kb.append(command)
+        droid = ZorkDroid("input.txt", kb)
+        finished, output = droid.move()
+        finished, output = droid.move()
+        room, desc, doors, items = droid.parse(output)
+        finished, commands = droid.action(output)
+        self.assertTrue(len(commands)==2)
+        print(commands)
+        self.assertTrue("take dark matter\n" in commands)
+        self.assertEqual(room,"Observatory")
+        self.assertEqual(desc,"There are a few telescopes; they're all bolted down, though.")
+        self.assertEqual(doors,["north", "east", "south"])
+        self.assertEqual(items,["dark matter"])
+        self.assertFalse(finished)
+
 if __name__ == '__main__':
     unittest.main()
 

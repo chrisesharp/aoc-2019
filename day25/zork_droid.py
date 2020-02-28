@@ -87,7 +87,7 @@ class ZorkDroid():
         print("Collected all items and at Security Gate")
         commands = []
         finished = False
-        for permutation in self.all_item_combinatins():
+        for permutation in self.all_item_combinations():
             for item in set(self.inventory):
                 self.drop_item(item, commands)
             for item in permutation:
@@ -98,7 +98,7 @@ class ZorkDroid():
             if finished: break
         return finished, output
     
-    def all_item_combinatins(self):
+    def all_item_combinations(self):
         combinations = []
         for i in range(2,len(self.inventory)):
             combinations.extend(list(itertools.combinations(self.inventory, i)))
