@@ -30,7 +30,8 @@ class ZorkDroid():
     def move(self):
         result = []
         while True:
-            if output := self.proc.run_to_output():
+            output = self.proc.run_to_output()
+            if output:
                 result.append(chr(output))
                 if is_command_prompt(result):
                     return False, stripped(result)
@@ -83,7 +84,7 @@ class ZorkDroid():
         return False, output
 
     def pass_security(self):
-        print("Collected all items")
+        print("Collected all items and at Security Gate")
         commands = []
         finished = False
         for permutation in self.all_item_combinatins():
@@ -92,6 +93,7 @@ class ZorkDroid():
             for item in permutation:
                 self.take_item(item, commands)
             commands.append("west\n")
+            print("Trying to pass with ", permutation)
             finished, output = self.follow_commands(commands)
             if finished: break
         return finished, output
@@ -149,4 +151,4 @@ if __name__ == '__main__':
                 output = commands
                 break
             finished, output = droid.follow_commands(commands)
-    print("Part 1:",output)
+    print("Part 1: PIN code is ",output)
