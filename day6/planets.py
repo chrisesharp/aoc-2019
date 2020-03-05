@@ -8,14 +8,12 @@ class Planet():
         if self.orbits == None:
             return 0
         return 1 + self.orbits.total_orbits()
-        
-    def __str__(self):
-        return self.name
 
 class StarMap():
-    planets = []
 
     def __init__(self, file):
+        self.planets = []
+
         for line in file:
             orbited, moon = line.strip().split(")")
             planet, satellite = self.find_planets(orbited, moon)
@@ -75,7 +73,7 @@ class StarMap():
         return path
 
 if __name__ == '__main__':
-    file = open("input.txt")
+    file = open("input.txt").readlines()
     starmap = StarMap(file)
     
     count = 0
