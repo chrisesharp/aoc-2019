@@ -1,6 +1,7 @@
 import unittest
 
-from opcodes import Processor, Amps
+from opcodes import Processor, get_program
+from amps import Amps, run_amps
 
 class AmpCode(unittest.TestCase):    
     def test_ex1(self):
@@ -20,26 +21,16 @@ class AmpCode(unittest.TestCase):
         prog = [3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0]
         output = 0
         phases = [0,1,2,3,4]
-        input = [0]
-        for setting in phases:
-            processor = Processor(prog)
-            input.append(setting)
-            output = processor.run(input)
-            input = [output]
-
+        amps = Amps(prog, 0, phases)
+        output = amps.start()
         self.assertEqual(54321, output)
 
     def test_ex3(self):
         prog = [3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0]
         output = 0
         phases = [1,0,4,3,2]
-        input = [0]
-        for setting in phases:
-            processor = Processor(prog)
-            input.append(setting)
-            output = processor.run(input)
-            input = [output]
-
+        amps = Amps(prog, 0, phases)
+        output = amps.start()
         self.assertEqual(65210, output)
     
     def test_ex4(self):
@@ -55,6 +46,11 @@ class AmpCode(unittest.TestCase):
         amps = Amps(prog, 0, phases)
         output = amps.start()
         self.assertEqual(18216, output)
+    
+    def test_answer_matches_actual_solution(self):
+        prog = get_program("input.txt")
+        self.assertEqual(117312, run_amps(prog, range(0,5)))
+        self.assertEqual(1336480, run_amps(prog, range(5,10)))
 
 
 if __name__ == "__main__":
