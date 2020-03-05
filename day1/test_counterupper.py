@@ -44,6 +44,13 @@ class CounterUpperTest(unittest.TestCase):
         expected_total_fuel = 50346
         calc = fuel_calc2(mass)
         self.assertEqual(expected_total_fuel, calc)
+    
+    def test_answer_matches_actual_solution(self):
+        total = 0
+        file = open("input.txt", "r")
+        for line in file:
+            total += fuel_calc2(int(line))
+        self.assertEqual(5055835, total)
 
 if __name__ == '__main__':
     unittest.main()

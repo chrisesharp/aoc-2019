@@ -14,7 +14,7 @@ def fuel_calc2(mass):
 
 
 if __name__ == '__main__':
-    file = open("input1.txt", "r")
+    file = open("input.txt", "r")
     total = 0
     for line in file:
         total += fuel_calc2(int(line))
