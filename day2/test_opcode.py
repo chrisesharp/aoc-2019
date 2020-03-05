@@ -1,6 +1,6 @@
 import unittest
 
-from opcodes import execute, fetch, run, program
+from opcodes import execute, fetch, run, program, part1, part2
 
 class OpCodeTest(unittest.TestCase):
     def test_opcode_1_123(self):
@@ -43,6 +43,12 @@ class OpCodeTest(unittest.TestCase):
         instructions = [1,1,1,4,99,5,6,0,99,0,0,0,0]
         prog = program(instructions, 12, 2)
         self.assertEqual([1,12,2,4,99,5,6,0,99,0,0,0,0], prog)
+    
+    def test_answer_matches_actual_solution(self):
+        prog = open("input.txt").read()
+        instructions = [int(x) for x in prog.split(",")]
+        self.assertEqual(9706670, part1(instructions, 12, 2))
+        self.assertEqual(2552, part2(instructions))
 
 if __name__ == '__main__':
     unittest.main()
