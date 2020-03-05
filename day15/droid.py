@@ -31,7 +31,9 @@ class Droid:
     self.bottom_right = (max(self.bottom_right[0], location[0]),
                           max(self.bottom_right[1], location[1]))
 
-  def map_ship(self, display=False):
+  def map_ship(self, computer=None, display=False):
+    if not computer:
+      computer = self.proc
     oxygen = None
     min_steps = 10**10
     ship_map = {(0, 0): Droid.CLEAR}
@@ -39,7 +41,7 @@ class Droid:
     options = {self.location: self.find_options()}
     path = []
     input = []
-    self.proc.set_std_input(input)
+    computer.set_std_input(input)
     
     while True:  
       backtracking = False    
@@ -53,7 +55,7 @@ class Droid:
       else:
         break
       
-      tile = self.proc.run_to_output(move)
+      tile = computer.run_to_output(move)
 
       if tile in {self.CLEAR, self.OXYGEN}:
         self.move(move)
@@ -116,6 +118,6 @@ if __name__ == '__main__':
       display = True
     prog = get_program(file)
     droid = Droid(prog)
-    oxygen, min_steps, ship_map = droid.map_ship(display)
+    oxygen, min_steps, ship_map = droid.map_ship(droid.proc, display)
     print("Part 1:", min_steps)
     print('Part 2:', fill(ship_map, oxygen))

@@ -3,6 +3,25 @@ from opcodes import Processor
 from droid import Droid, get_program, fill, render, neighbours
 from direction import Direction, opposite_direction, next_location
 
+class Mock():
+    def __init__(self, map):
+        self.map = map
+        self.input = []
+        self.location = (0,0)
+    
+    def set_std_input(self, stdin):
+        self.input = stdin
+
+    def run_to_output(self, move):
+        next_pos =  next_location(self.location, move)
+        if self.map.get(next_pos) == Droid.CLEAR:
+            self.location = next_pos
+            return 1
+        elif self.map.get(next_pos) == Droid.OXYGEN:
+            self.location = next_pos
+            return 2
+        return 0
+
 class DroidTest(unittest.TestCase):    
     def test_opposite_directions(self):
         self.assertEqual(Direction.SOUTH, opposite_direction(Direction.NORTH))
@@ -64,17 +83,21 @@ class DroidTest(unittest.TestCase):
         time = fill(ship_map,(1,1))
         self.assertEqual(1, time)
     
-    def test_fill_ship_map(self):
-        ship_map = {(0, 0): Droid.WALL, (1,0): Droid.WALL,  (2,0): Droid.WALL, (3,0): Droid.WALL,
-                    (0, 1): Droid.CLEAR, (1,1): Droid.OXYGEN,(2,1): Droid.CLEAR, (3,1): Droid.CLEAR,
-                    (0, 2): Droid.WALL, (1,2): Droid.WALL,  (2,2): Droid.WALL, (3,2): Droid.WALL,}
-        time = fill(ship_map,(1,1))
-        self.assertEqual(2, time)
+    def test_map_of_ship_map(self):
+        ship_map = {(-1, -1): Droid.WALL, (0,-1): Droid.WALL,  (1,-1): Droid.WALL, (2,-1): Droid.WALL,
+                    (-1, 0): Droid.WALL, (0,0): Droid.CLEAR,(1,0): Droid.OXYGEN, (2,0): Droid.WALL,
+                    (-1, 1): Droid.WALL, (0,1): Droid.WALL,  (1,1): Droid.WALL, (2,1): Droid.WALL}
+        mock_comp = Mock(ship_map)
+        droid = Droid("")
+        oxygen, min_steps, output_map = droid.map_ship(mock_comp)
+        self.assertEqual({(0, 0): 1, (1, 0): 2}, output_map)
+        self.assertEqual(1, min_steps)
+        self.assertEqual((1,0), oxygen)
 
-    # def test_real_answer_given(self):
-    #     file = "input.txt"
-    #     prog = get_program(file)
-    #     droid = Droid(prog)
-    #     oxygen, min_steps, ship_map = droid.map_ship()
-    #     self.assertEqual(246, min_steps)
-    #     self.assertEqual(376, fill(ship_map, oxygen))
+    def test_answer_matches_solution(self):
+        file = "input.txt"
+        prog = get_program(file)
+        droid = Droid(prog)
+        oxygen, min_steps, ship_map = droid.map_ship()
+        self.assertEqual(246, min_steps)
+        self.assertEqual(376, fill(ship_map, oxygen))
