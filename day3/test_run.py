@@ -58,6 +58,13 @@ class TestTest(unittest.TestCase):
         second = trace_path("U98,R91,D20,R16,D67,R40,U7,R15,U6,R7")
         result = calculate_distance(stepcount, [first, second])
         self.assertEqual(410, result)
+    
+    def test_answer_matches_actual_solution(self):
+        file = open("input.txt", "r")
+        first = trace_path(file.readline())
+        second = trace_path(file.readline())
+        self.assertEqual(2180, calculate_distance(distance, [first, second]))
+        self.assertEqual(112316, calculate_distance(stepcount, [first, second]))
         
 
 if __name__ == '__main__':

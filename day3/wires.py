@@ -41,7 +41,7 @@ def calculate_distance(func, paths):
     return steps
 
 if __name__ == '__main__':
-    file = open("input1.txt", "r")
+    file = open("input.txt", "r")
     first = trace_path(file.readline())
     second = trace_path(file.readline())
     result = calculate_distance(distance, [first, second])
