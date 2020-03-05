@@ -31,6 +31,14 @@ class OpCodeTest(unittest.TestCase):
         processor = Processor([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99])
         output = processor.run(9)
         self.assertEqual(1001, output)
+    
+    def test_answer_matches_actual_solution(self):
+        prog = open("input.txt").read().split(",")
+        instructions = [int(x) for x in prog]
+        processor = Processor(instructions)
+        self.assertEqual(15097178,processor.run(1))
+        processor = Processor(instructions)
+        self.assertEqual(1558663, processor.run(5))
 
 
 if __name__ == '__main__':
