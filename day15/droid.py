@@ -77,21 +77,23 @@ class Droid:
     return set(choices).difference(non_option)
 
   def display(self, ship_map):
-    width = self.bottom_right[0] - self.top_left[0]
-    height = self.bottom_right[1] - self.top_left[1]
-    output_string = ""
-    
-    for y in range(height + 1):
-      for x in range(width + 1):
-        if self.location == (self.top_left[0]+ x, self.top_left[1]+ y):
-          output_string += "D"
-        else:
-          panel = ship_map.get((self.top_left[0] + x, self.top_left[1] + y),False)
-          output_string += Droid.TILES[panel]
-        output_string += "\n"
     subprocess.call("clear")
-    print(output_string)
+    print(render(ship_map, self.bottom_right, self.top_left, self.location))
     sleep(1/30)
+  
+def render(ship_map, bottom_right, top_left, droid_location):
+  width = bottom_right[0] - top_left[0]
+  height = bottom_right[1] - top_left[1]
+  output_string = ""
+  for y in range(height + 1):
+    for x in range(width + 1):
+      if droid_location == (top_left[0]+ x, top_left[1]+ y):
+        output_string += "D"
+      else:
+        panel = ship_map.get((top_left[0] + x, top_left[1] + y),False)
+        output_string += Droid.TILES[panel]
+    output_string += "\n"
+  return output_string
 
 def neighbours(map, loc):
   (x, y) = loc
@@ -109,8 +111,11 @@ def fill(ship_map, loc, t = 0):
 
 if __name__ == '__main__':
     file = "input.txt"
+    display = False
+    if len(sys.argv) > 1:
+      display = True
     prog = get_program(file)
     droid = Droid(prog)
-    oxygen, min_steps, ship_map = droid.map_ship()
+    oxygen, min_steps, ship_map = droid.map_ship(display)
     print("Part 1:", min_steps)
     print('Part 2:', fill(ship_map, oxygen))
