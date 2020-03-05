@@ -38,5 +38,16 @@ class TestPasswordChecker(unittest.TestCase):
         self.assertFalse(checker(input2))
         self.assertFalse(checker(input3))
 
+    def test_answer_matches_actual_solution(self):
+        pt1 = 0
+        pt2 = 0
+        lower = 264793
+        upper = 803935
+        for input in range(lower, upper):
+            if checker(input, True): pt1+=1
+            if checker(input, False): pt2+=1
+        self.assertEqual(966, pt1)
+        self.assertEqual(628, pt2)
+
 if __name__ == '__main__':
     unittest.main()
