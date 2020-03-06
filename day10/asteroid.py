@@ -43,8 +43,6 @@ def find_nth_target(n, laser, starmap):
     while count < n and angles:
         if target_angle == angles[idx][0]:
             idx += 1
-            if idx >= len(angles):
-                idx = 0
             continue
         target_angle, target = angles.pop(idx)
         count += 1
@@ -56,10 +54,9 @@ if __name__ == '__main__':
     starmap = get_map(input)
 
     print("Part 1:")
-    best = best_location(starmap)
-    print("Location: {}, visible:{}".format(*best))
+    laser, dist = best_location(starmap)
+    print("Location: {}, visible:{}".format(laser, dist))
 
     print("Part 2")
-    laser = best[0]
     asteroid = find_nth_target(200, laser, starmap)
     print("Answer: ", asteroid[0]*100 + asteroid[1])

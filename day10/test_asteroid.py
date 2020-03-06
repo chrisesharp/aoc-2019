@@ -70,6 +70,14 @@ class AsteroidTest(unittest.TestCase):
         asteroid = find_nth_target(9, laser, map)
         self.assertEqual(target_9, asteroid)
     
+    def test_answer_matches_actual_solution(self):
+        input = open("input.txt").read()
+        starmap = get_map(input)
+        laser, dist = best_location(starmap)
+        self.assertEqual((27, 19), laser)
+        self.assertEqual(314, dist)
+        asteroid = find_nth_target(200, laser, starmap)
+        self.assertEqual(1513, asteroid[0]*100 + asteroid[1])
 
 if __name__ == '__main__':
     unittest.main()
