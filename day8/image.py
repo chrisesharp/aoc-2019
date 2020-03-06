@@ -43,24 +43,26 @@ class SpaceImage():
         return output_layer
     
     def __str__(self):
-        im = Image.new('1', (self.width,self.height))
         output_string = "\n"
         output_layer = self.flatten()
         for y in range(self.height):
             for x in range(self.width):
-                if output_layer[y][x]:
-                    im.putpixel((x,y), ImageColor.getcolor('white', '1'))
                 output_string += str(output_layer[y][x])
             output_string += "\n"
-        file = "output.png"
-        im.save(file)
         return output_string
-
+    
+    def save_png(self, file):
+        im = Image.new('1', (self.width,self.height))
+        output_layer = self.flatten()
+        for x,y in [(x,y) for y in range(self.height) for x in range(self.width) if output_layer[y][x]]:
+            im.putpixel((x,y), ImageColor.getcolor('white', '1'))
+        im.save(file)
 
 if __name__ == '__main__':
     file = open("input.txt")
     line = file.readline().rstrip()
     image = SpaceImage(line, 25, 6)
+    image.save_png("output.png")
     layer = image.fewest_zeros()
     ones = layer.count(1)
     twos = layer.count(2)
