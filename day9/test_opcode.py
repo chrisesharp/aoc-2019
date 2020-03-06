@@ -1,6 +1,6 @@
 import unittest
 
-from opcodes import Processor
+from opcodes import Processor, get_program
 
 class OpCodeTest(unittest.TestCase):    
     def test_ex1_position(self):
@@ -39,6 +39,30 @@ class OpCodeTest(unittest.TestCase):
         output = processor.run([])
         answer = 1125899906842624
         self.assertEqual(answer, output[0])
+    
+    def test_get_program(self):
+        file = "input.txt"
+        prog = get_program(file)
+        self.assertEqual(1102,prog[0])
+        self.assertEqual(34463338,prog[1])
+        self.assertEqual(34463338,prog[2])
+        self.assertEqual(63,prog[3])
+
+    def test_get_std_output(self):
+        prog = [104,1125899906842624,99]
+        processor = Processor(prog, 120, True)
+        self.assertEqual(None, processor.get_std_output())
+        processor.run([])
+        self.assertEqual(1125899906842624, processor.get_std_output())
+    
+    def test_answer_matches_actual_solution(self):
+        prog = get_program("input.txt")
+        processor = Processor(prog, 10000, True)
+        processor.run([1])
+        self.assertEqual(4261108180, processor.get_std_output())
+        processor = Processor(prog, 10000, True)
+        processor.run([2])
+        self.assertEqual(77944, processor.get_std_output())
 
 if __name__ == '__main__':
     unittest.main()
