@@ -86,6 +86,18 @@ class MoonTest(unittest.TestCase):
         tx, ty, tz = tick_cycles(moons)
         cycle = lcm(lcm(tx, ty), lcm(ty, tz))
         self.assertEqual(4686774924,cycle)
+    
+    def test_answer_matches_actual_result(self):
+        input = open("input.txt").read()
+        moons = get_moons(input)
+        for i in range(1000):
+            energy = tick(moons)
+        self.assertEqual(9958, energy)
+        
+        moons = get_moons(input)
+        tx, ty, tz = tick_cycles(moons)
+        cycle = lcm(lcm(tx, ty), lcm(ty, tz))
+        self.assertEqual(318382803780324, cycle)
 
 if __name__ == '__main__':
     unittest.main()

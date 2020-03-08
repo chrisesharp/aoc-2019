@@ -1,8 +1,4 @@
 class Moon():
-    orig = None
-    pos = None
-    velocity = None
-
     def __init__(self, input):
         x,y,z = [0, 0, 0]
         for element in input[1:-1].split(","):
@@ -19,9 +15,6 @@ class Moon():
     
     def __repr__(self):
         return tuple(self.pos)
-    
-    def __str__(self):
-        return str(self.__repr__())
 
     def tick(self):
         for i in range(3):
