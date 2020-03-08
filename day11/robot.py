@@ -34,7 +34,6 @@ class Robot():
         input = [panels[self.location]]
         self.proc.set_std_input(input)
         outputs = []
-        output = None
         while self.proc.step():
             output = self.proc.get_std_output()
             if output != None:
@@ -47,26 +46,42 @@ class Robot():
                 input.insert(0,panels.get(self.location,0))
         return panels
     
-    def display(self, panels, n):
+    def render(self, panels, output_buffer, render_func):
+        for y in range(self.top_left[1], self.bottom_right[1] + 1):
+            for x in range(self.top_left[0], self.bottom_right[0] + 1):
+                paint = panels.get((x, y), 0)
+                render_func(output_buffer, (x,y), paint)
+
+    def display_string(self, panels):
+        output_buffer = ["\n"]
+        self.render(panels, output_buffer, self.to_string)
+        return "".join(output_buffer)
+    
+    def save_png(self, panels, n):
         width = self.bottom_right[0] - self.top_left[0]
         height = self.bottom_right[1] - self.top_left[1]
-        im = Image.new('1', (width+1,height+1))
-        output_string = "\n"
-        
-        for y in range(height+1):
-            for x in range(width+1):
-                panel = (self.top_left[0] + x, self.top_left[1] + y)
-                paint = panels.get(panel,0)
-                if paint:
-                    im.putpixel((x,y), ImageColor.getcolor('white', '1'))
-                    output_string += "#"
-                else:
-                    output_string += " "
-            output_string += "\n"
-        im.save("output_" + str(n) + ".png")
-        return output_string
+        img = Image.new('1', (width + 1, height + 1))
+        self.render(panels, img, self.to_image)
+        img.save("output_" + str(n) + ".png")
 
+    def to_image(self, buffer, pixel, paint):
+        width = self.bottom_right[0] - self.top_left[0]
+        height = self.bottom_right[1] - self.top_left[1]
+        x, y = pixel
+        x += width - self.bottom_right[0]
+        y += height - self.bottom_right[1]
+        if paint:
+            buffer.putpixel((x,y), ImageColor.getcolor('white', '1'))
 
+    def to_string(self, buffer, pixel, paint):
+        x, y = pixel
+        if paint:
+            buffer.append("#")
+        else:
+            buffer.append(" ")
+        if x == self.bottom_right[0]:
+            buffer.append("\n")
+    
 if __name__ == '__main__':
     file = "input.txt"
     prog = get_program(file)
@@ -76,16 +91,13 @@ if __name__ == '__main__':
     panels = {(0,0):0}
     panels = robot.run(panels)
     print(len(panels.keys()))
-    print(robot.display(panels,1))
+    # print(robot.display_string(panels))
+    # robot.save_png(panels, 1)
     
     print("Part 2:")
     processor = Processor(prog, 512, True)
     robot = Robot(processor)
     panels = {(0,0):1}
     panels = robot.run(panels)
-    print(robot.display(panels,2))
-
-
-
-
-
+    print(robot.display_string(panels))
+    # robot.save_png(panels, 2)
