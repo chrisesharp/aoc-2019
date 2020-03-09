@@ -1,5 +1,6 @@
 from opcodes import get_program, Processor
 from display import Display
+from tile import Tile
 import curses
 
 class JoyStick():
@@ -13,9 +14,6 @@ class JoyStick():
     
     def move(self, direction):
         self.input = [direction]
-    
-    def __str__(self):
-        return str(self.input)
 
 class Arcade():
     def __init__(self, file, mem_zero, interactive=False):
@@ -32,18 +30,19 @@ class Arcade():
         self.paddle = None
         for y in range(self.rows):
             for x in range(self.columns):
-                self.field[(x, y)] = 0
+                self.field[(x, y)] = Tile.EMPTY
     
     def run(self, screen=None):
-        self.screen = Display(screen)
+        self.display = Display(screen)
         self.running = True
         self.proc.set_std_input(self.joystick)
         while self.running:
             self.tick()
-        self.screen.exit(self)
+        self.display.exit(self)
+        return list(self.field.values()).count(Tile.BLOCK)
     
     def tick(self):
-        self.screen.display(self)
+        self.display.refresh(self)
         outputs = []
         output = None
         op = None
@@ -60,36 +59,35 @@ class Arcade():
     def process_outputs(self, outputs):
         x, y, tile = outputs
         if x == -1:
-            self.score = tile if tile >= self.score else self.score
+            self.score = tile
         else:
+            tile = Tile(tile)
             self.field[(x,y)] = tile
-        if tile == 3:
-            self.paddle = x
-        if tile == 4:
-            self.ball = x
+            if tile == Tile.PADDLE:
+                self.paddle = x
+            if tile == Tile.BALL:
+                self.ball = x
         if not self.interactive:
             self.auto_move()
         else:
-            self.screen.FPS = 1/50 if self.paddle else 0
+            self.display.FPS = 1/30 if self.paddle else 0
 
     def auto_move(self):
+        sign = lambda x: x and (1, -1)[x<0]
         if self.ball and self.paddle:
-            if self.ball < self.paddle:
-                self.joystick.move(-1)
-            elif self.ball > self.paddle:
-                self.joystick.move(1)
-            else:
-                self.joystick.move(0)
+            self.joystick.move(sign(self.ball - self.paddle))
 
 
 if __name__ == '__main__':
-    # print("Part 1:")
-    # breakout = Arcade("input.txt", 1)
-    # curses.wrapper(breakout.run)
-    print("Part 2:")
+    breakout = Arcade("input.txt", 1)
+    blocks = breakout.run()
+    print("Part 1:", blocks)
+
     breakout = Arcade("input.txt", 2)
     curses.wrapper(breakout.run)
-    print("score = ",breakout.score)
+    print("Part 2:", breakout.score)
+    
+    ## Interactive Mode
     # breakout = Arcade("input.txt", 2, True)
     # curses.wrapper(breakout.run)
 
