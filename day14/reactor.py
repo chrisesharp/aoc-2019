@@ -7,16 +7,10 @@ class Ingredient():
         A, B = ingredient.strip().split()
         self.quantity = int(A)
         self.chemical = B
-    
-    def __hash__(self):
-        return hash((self.chemical, self.quantity))
-    
+
     def __repr__(self):
         return str(self)
-    
-    def __eq__(self, other):
-        return (self.chemical == other.chemical and self.quantity == other.quantity)
-    
+
     def __str__(self):
         return "<" + str(self.quantity) + "," + self.chemical + ">" 
 
@@ -64,7 +58,8 @@ def ore_required(reactions):
 def max_fuel(reactions):
     low, high = 0, high_bar
     while low < high:
-        mid = low + (high - low) // 2
+        print(low, high)
+        mid = low + (high - low) // 2 + 1
         totals = {element: 0 for element in reactions}
         totals['ORE'] = high_bar
         if ensure(reactions, totals, 'FUEL', mid):
