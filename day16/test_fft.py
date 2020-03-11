@@ -1,6 +1,6 @@
 import unittest
 
-from fft import apply_fft, calc_pattern
+from fft import apply_fft, calc_pattern, part1, part2
 
 class FFTTest(unittest.TestCase):
     def test_fft_ex1(self):
@@ -47,6 +47,31 @@ class FFTTest(unittest.TestCase):
             input = output
         output = str(output)[:8]
         self.assertEqual("52432133", output)
+    
+    def test_part1_ex1(self):
+        input = "69317163492948606335995924319873"
+        output = part1(input)
+        self.assertEqual(52432133, output)
+    
+    def test_part2_ex1(self):
+        input = "03036732577212944063491565474664"
+        output = part2(input)
+        self.assertEqual(84462026, output)
+    
+    def test_part2_ex2(self):
+        input = "02935109699940807407585447034323"
+        output = part2(input)
+        self.assertEqual(78725270, output)
+    
+    def test_part2_ex3(self):
+        input = "03081770884921959731165446850517"
+        output = part2(input)
+        self.assertEqual(53553731, output)
+    
+    def test_answer_matches_actual_solution(self):
+        input = open("input.txt").readline().strip()
+        self.assertEqual(82525123, part1(input))
+        self.assertEqual(49476260, part2(input))
 
 if __name__ == '__main__':
     unittest.main()

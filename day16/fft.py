@@ -25,7 +25,7 @@ def part2(input):
     arr = [next(digit) for _ in range(10000 * len(digits) - offset)]
     for _ in range(100):
         arr = [n % 10 for n in accumulate(arr)]
-    return ''.join(list(map(str,arr[-1:-9:-1])))
+    return int(''.join(list(map(str,arr[-1:-9:-1]))))
 
 def pattern_cycle(pattern, index):
     cyc = cycle(calc_pattern(pattern, index))
@@ -37,10 +37,5 @@ def calc_pattern(pattern, index):
 
 if __name__ == '__main__':
     input = open("input.txt").readline().strip()
-    part1 = input[:]
-    length = len(str(input))
-    for _ in range(100):
-        part1 = apply_fft(part1, length)
-    output = int(str(part1)[:8])
-    print("Part 1:",output)
+    print("Part 1:",part1(input))
     print("Part 2:",part2(input))
